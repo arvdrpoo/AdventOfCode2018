@@ -3,13 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Day2", "Day2\Day2.fsproj", "{4C097136-7CA6-4E74-A935-62A572BF7906}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Day2", "Day2\Day2.fsproj", "{4C097136-7CA6-4E74-A935-62A572BF7906}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Day1", "Day1\Day1.fsproj", "{411F80C8-82B3-4E67-8F0C-A61C2049A154}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Util", "Util\Util.fsproj", "{22E4474A-89E3-440B-A202-726A6F4A1207}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Util", "Util\Util.fsproj", "{22E4474A-89E3-440B-A202-726A6F4A1207}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Day3", "Day3\Day3.fsproj", "{5A16AC3B-6384-4B9D-901E-DE6AC8B1754A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8D865CBC-2B98-4AE8-A4F0-0584E1254E71}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +33,6 @@ Global
 		{22E4474A-89E3-440B-A202-726A6F4A1207}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22E4474A-89E3-440B-A202-726A6F4A1207}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22E4474A-89E3-440B-A202-726A6F4A1207}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5A16AC3B-6384-4B9D-901E-DE6AC8B1754A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5A16AC3B-6384-4B9D-901E-DE6AC8B1754A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5A16AC3B-6384-4B9D-901E-DE6AC8B1754A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5A16AC3B-6384-4B9D-901E-DE6AC8B1754A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
