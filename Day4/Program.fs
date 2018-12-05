@@ -1,19 +1,9 @@
 ﻿open System
-open Util.Regex
-open Util.Arr
 open System.Collections.Generic
+open Util.Regex
 
 let split (input:string)=
     input.Split("\r\n")
-
-let incrementDayString (day:string) =
-    let ca = day.ToCharArray()
-    if ca.[ca.Length-1] = '9' then
-        ca.[ca.Length-1] <- '0'
-        ca.[ca.Length-2] <- (((ca.[ca.Length-2]|>int)+1) |> char)
-    else
-        ca.[ca.Length-1] <- (((ca.[ca.Length-1]|>int)+1) |> char)
-    String.Concat ca
 
 let rec handle guard (datastructure:Map<string,Map<string,bool []>>) (arr:string list) =
     match arr with
@@ -1334,7 +1324,6 @@ let main argv =
             |> List.maxBy (fun (_,l) -> l)
         )
         |> Map.toList
-        |> tee
         |> List.maxBy (fun (_,(_,t)) -> t)
 
     stopwatch.Stop()
