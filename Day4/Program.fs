@@ -1,6 +1,6 @@
 ﻿open System
 open Util.Regex
-open Util
+open Util.Arr
 open System.Collections.Generic
 
 let split (input:string)=
@@ -8,43 +8,40 @@ let split (input:string)=
 
 let incrementDayString (day:string) =
     let ca = day.ToCharArray()
-    ca.[ca.Length-1] <- (((ca.[ca.Length-1]|>int)+1) |> char)
+    if ca.[ca.Length-1] = '9' then
+        ca.[ca.Length-1] <- '0'
+        ca.[ca.Length-2] <- (((ca.[ca.Length-2]|>int)+1) |> char)
+    else
+        ca.[ca.Length-1] <- (((ca.[ca.Length-1]|>int)+1) |> char)
     String.Concat ca
 
 let rec handle guard (datastructure:Map<string,Map<string,bool []>>) (arr:string list) =
     match arr with
     | head :: tail ->
         match head with
-        | Regex @"\[.+?-(\d\d\-\d\d) (\d+):(\d+)\] (.+)" [day; hour; min; action] ->
-            let newday = if hour = "00" then day else incrementDayString day
+        | Regex @"\[(\d+)-(\d\d)-(\d\d) (\d+):(\d+)\] (.+)" [year; month; day; hour; min; action] ->
+            let date = new DateTime(year|>int,month|>int,day|>int,hour|>int,min|>int,0)
+            let origday = date.ToString "MM-dd"
+            let newdate =
+                if date.Hour = 0 then
+                    date
+                else
+                    new DateTime (date.AddDays(1.0).Year,date.AddDays(1.0).Month,date.AddDays(1.0).Day)
+            let newday = newdate.ToString "MM-dd"
             match action with
             | Regex @"Guard #(\d+)" [newguard] ->
-                // finish previous guards shift as awake
-                if datastructure.ContainsKey guard then
-                    if datastructure.[guard].ContainsKey newday then
-                        let minMin =
-                            try
-                                Array.findIndexBack (fun a -> a) datastructure.[guard].[day]
-                            with
-                                | :? KeyNotFoundException as ex -> 0
-                        for i in [minMin..59] do
-                            datastructure.[guard].[newday].[i] <- true
                 if datastructure.ContainsKey newguard then
                     if not (datastructure.[newguard].ContainsKey newday) then
                         let newDs =
-                            if not (datastructure.[newguard].ContainsKey newday) then
-                                let minutes : bool array = Array.zeroCreate 60
-                                let newDay =
-                                    if hour = "00" then
-                                        minutes.[min|>int] <- true
-                                        datastructure.[newguard]
-                                        |> Map.add newday minutes
-                                    else
-                                        minutes.[0] <- true
-                                        datastructure.[newguard]
-                                        |> Map.add (incrementDayString newday) minutes
-                                datastructure |> Map.add newguard newDay
-                            else datastructure
+                            let minutes : bool array = Array.zeroCreate 60
+                            let newDay =
+                                if hour = "00" then
+                                    minutes.[min|>int] <- true
+                                else
+                                    minutes.[0] <- true
+                                datastructure.[newguard]
+                                |> Map.add newday minutes
+                            datastructure |> Map.add newguard newDay
                         handle newguard newDs tail
                     else
                         handle newguard datastructure tail
@@ -54,34 +51,27 @@ let rec handle guard (datastructure:Map<string,Map<string,bool []>>) (arr:string
                     let minutes : bool array = Array.zeroCreate 60
                     // guard starts out as awake
                     let newMap =
-                        if hour = "00" then
-                            minutes.[min|>int] <- true
-                            Map.empty
-                            |> Map.add day minutes
-                        else
-                            minutes.[0] <- true
-                            Map.empty
-                            |> Map.add (incrementDayString day) minutes
-
+                        Map.empty
+                        |> Map.add newday minutes
                     let newDs =
                         datastructure
                         |> Map.add newguard newMap
                     handle newguard newDs tail
             | Regex @"wakes up" [] ->
                 // set time to awake
-                datastructure.[guard].[day].[min|>int] <- true
+                datastructure.[guard].[newday].[min|>int] <- true
                 handle guard datastructure tail
             | Regex @"falls asleep" []->
                 // set all times before this to awake
                 let maxMin = min|> int
                 let minMin =
                     try
-                        Array.findIndexBack (fun a -> a) datastructure.[guard].[day].[0..maxMin]
+                        Array.findIndexBack (fun a -> a) datastructure.[guard].[newday].[0..maxMin]
                     with
                         | :? KeyNotFoundException as ex -> 0
 
                 for i in [minMin..maxMin-1] do
-                    datastructure.[guard].[day].[i] <- true
+                    datastructure.[guard].[newday].[i] <- true
                 handle guard datastructure tail
             | _ -> handle guard datastructure tail
         | _ -> handle guard datastructure tail
@@ -1277,7 +1267,7 @@ let main argv =
     let stopwatch = System.Diagnostics.Stopwatch.StartNew()
 
     let split =
-        split testinput
+        split input
         |> Array.sort
 
     // (guard,day,minute) -> awake
@@ -1309,7 +1299,7 @@ let main argv =
     printfn "sleepiest guard is %s" sleepyGuard
     printfn "\t calculation too %i milliseconds" stopwatch.ElapsedMilliseconds
     stopwatch.Restart()
-    // find that guards most likely method of being asleep
+    // find that guards most likely minute of being asleep
 
     let sleepyMinute =
         datastruct.[sleepyGuard]
