@@ -1319,5 +1319,28 @@ let main argv =
     printfn "sleepiest minute of guard %s is %i" sleepyGuard sleepyMinute
     printfn "result of day 4 part 1 is: %i" ((sleepyGuard|>int) * sleepyMinute)
     printfn "\t calculation took %i milliseconds" stopwatch.ElapsedMilliseconds
+
+    stopwatch.Restart()
+    let popular =
+        datastruct
+        |> Map.map (fun guard day ->
+            Map.toList day
+            |> List.map snd
+            |> List.map (fun i -> Array.toList i |> List.indexed)
+            |> List.concat
+            //|> List.filter (fun (_,awake) -> not awake)
+            |> List.groupBy (fun (i,_) -> i)
+            |> List.map (fun (i,l) -> (i,(List.fold (fun acc (_,awake) -> if awake then acc else acc+1) 0 l)))
+            |> List.maxBy (fun (_,l) -> l)
+        )
+        |> Map.toList
+        |> tee
+        |> List.maxBy (fun (_,(_,t)) -> t)
+
+    stopwatch.Stop()
+    printfn "Guard %s spent minute %i asleep more than anyone: %i times" (fst popular) (fst (snd popular)) (snd (snd popular))
+    printfn "result of day 4 part 2 is: %i" (((fst popular)|>int) * (fst (snd popular)))
+    printfn "\t calculation took %i milliseconds" stopwatch.ElapsedMilliseconds
+
     Console.ReadKey() |> ignore
     0 // return an integer exit code
